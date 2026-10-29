@@ -1,0 +1,11 @@
+export { createGuard } from "./guard.js";
+export type { Guard, GuardOptions, GuardResult } from "./guard.js";
+export { guardMiddleware } from "./middleware.js";
+export type { GuardMiddlewareOptions } from "./middleware.js";
+export { ClassifierError, createClaudeClassifier } from "./classifier.js";
+export type { Classifier, ClaudeClassifierOptions } from "./classifier.js";
+export { runDetectors } from "./detectors/index.js";
+export type { Detector, DetectorResult } from "./detectors/index.js";
+export { redactPii } from "./pii/redact.js";
+export type { PiiEntity, RedactionResult } from "./pii/redact.js";
+export type { PiiType } from "./pii/patterns.js";
