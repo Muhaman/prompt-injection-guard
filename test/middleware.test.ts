@@ -8,7 +8,7 @@ function makeApp(field?: string) {
   const app = express();
   app.use(express.json());
   app.post("/chat", guardMiddleware(createGuard(), field === undefined ? {} : { field }), (req, res) => {
-    res.json({ seen: (req.body as Record<string, unknown>)[field ?? "message"], blocked: false });
+    res.json({ seen: (req.body as Record<string, unknown>)[field ?? "message"] });
   });
   return app;
 }

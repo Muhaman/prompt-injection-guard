@@ -3,13 +3,14 @@ import { describe, expect, it, vi } from "vitest";
 import { ClassifierError, createClaudeClassifier } from "../src/classifier.js";
 
 function stubClient(impl: () => unknown) {
-  const parse = vi.fn(impl);
+  const parse = vi.fn<(params: unknown) => unknown>();
+  parse.mockImplementation(impl);
   return { client: { beta: { messages: { parse } } } as unknown as Anthropic, parse };
 }
 
 const ok = { stop_reason: "end_turn", parsed_output: { injection_probability: 0.82, reason: "asks to leak prompt" } };
 
-function firstCall(parse: ReturnType<typeof vi.fn>): Record<string, unknown> {
+function firstCall(parse: { mock: { calls: unknown[][] } }): Record<string, unknown> {
   return parse.mock.calls[0]?.[0] as Record<string, unknown>;
 }
 
