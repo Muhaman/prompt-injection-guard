@@ -87,6 +87,19 @@ describe("createGuard", () => {
     expect(result.restore(result.redacted)).toBe("mail a@example.com");
   });
 
+  it("blocks over-length input without running detectors or the classifier", async () => {
+    const classifier = stubClassifier();
+    const result = await createGuard({ classifier, maxLength: 10 }).check("a".repeat(11));
+    expect(result).toMatchObject({ allowed: false, score: 1, reasons: ["input too long"], redacted: "", entities: [] });
+    expect(heuristic).not.toHaveBeenCalled();
+    expect(classifier.classify).not.toHaveBeenCalled();
+  });
+
+  it("allows input exactly at maxLength", async () => {
+    heuristic.mockReturnValue({ score: 0, reasons: [] });
+    expect((await createGuard({ maxLength: 10 }).check("a".repeat(10))).allowed).toBe(true);
+  });
+
   it("skips redaction when disabled", async () => {
     heuristic.mockReturnValue({ score: 0, reasons: [] });
     const result = await createGuard({ redactPii: false }).check("mail a@example.com");

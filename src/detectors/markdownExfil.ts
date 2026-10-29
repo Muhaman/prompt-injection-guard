@@ -4,17 +4,17 @@ const SENSITIVE_PARAM = "(?:d|data|q|query|c|content|secret|token|key|prompt|ses
 
 const RULES: Rule[] = [
   {
-    pattern: new RegExp(`!\\[[^\\]]*\\]\\(\\s*https?:\\/\\/[^)\\s]*[?&]${SENSITIVE_PARAM}=[^)\\s]*\\)`, "i"),
+    pattern: new RegExp(`!\\[[^\\]]{0,200}\\]\\(\\s{0,10}https?:\\/\\/[^)\\s]{0,1000}[?&]${SENSITIVE_PARAM}=[^)\\s]{0,1000}\\)`, "i"),
     score: 0.9,
     reason: "markdown image whose URL carries data in a query parameter",
   },
   {
-    pattern: /!\[[^\]]*\]\(\s*https?:\/\/[^)\s]*\?[^)\s]*\)/i,
+    pattern: /!\[[^\]]{0,200}\]\(\s{0,10}https?:\/\/[^)\s]{0,1000}\?[^)\s]{0,1000}\)/i,
     score: 0.7,
     reason: "markdown image with a query string (possible data exfiltration)",
   },
   {
-    pattern: /<img\b[^>]*\bsrc\s*=\s*["']?https?:\/\/[^"'>\s]*\?[^"'>\s]*/i,
+    pattern: /<img\b[^>]{0,500}\bsrc\s{0,5}=\s{0,5}["']?https?:\/\/[^"'>\s]{0,1000}\?/i,
     score: 0.7,
     reason: "HTML image with a query string (possible data exfiltration)",
   },
@@ -24,7 +24,7 @@ const RULES: Rule[] = [
     reason: "embeds active HTML content",
   },
   {
-    pattern: new RegExp(`\\[[^\\]]*\\]\\(\\s*https?:\\/\\/[^)\\s]*[?&]${SENSITIVE_PARAM}=[^)\\s]*\\)`, "i"),
+    pattern: new RegExp(`\\[[^\\]]{0,200}\\]\\(\\s{0,10}https?:\\/\\/[^)\\s]{0,1000}[?&]${SENSITIVE_PARAM}=[^)\\s]{0,1000}\\)`, "i"),
     score: 0.5,
     reason: "markdown link whose URL carries data in a query parameter",
   },

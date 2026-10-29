@@ -11,6 +11,8 @@ export interface GuardOptions {
   classifierBand?: [number, number];
   /** Default true. */
   redactPii?: boolean;
+  /** Longer input is blocked without running any detector. Default 20_000 characters. */
+  maxLength?: number;
 }
 
 export interface GuardResult {
@@ -33,9 +35,21 @@ export function createGuard(options: GuardOptions = {}): Guard {
   const [bandLow, bandHigh] = options.classifierBand ?? [0.3, 0.7];
   const { classifier } = options;
   const shouldRedact = options.redactPii ?? true;
+  const maxLength = options.maxLength ?? 20_000;
 
   return {
     async check(text) {
+      if (text.length > maxLength) {
+        // Bound the work an attacker can force; nothing is scanned, so nothing is echoed back.
+        return {
+          allowed: false,
+          score: 1,
+          reasons: ["input too long"],
+          redacted: "",
+          entities: [],
+          restore: (s) => s,
+        };
+      }
       const pii = shouldRedact
         ? redactPii(text)
         : { redacted: text, entities: [], restore: (s: string) => s };

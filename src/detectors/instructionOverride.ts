@@ -13,7 +13,7 @@ const RULES: Rule[] = [
   },
   {
     pattern: new RegExp(
-      `\\b(?:reveal|show|print|repeat|output|leak|display|disclose|expose|tell me)\\b[^.\\n]{0,40}?\\b(?:${PROMPT_WORDS})\\s+(?:prompt|instructions?|message)`,
+      `\\b(?:reveal|show|print|repeat|output|leak|display|disclose|expose|tell me)\\b[^.\\n]{0,40}?\\b(?:${PROMPT_WORDS})\\s{1,5}(?:prompt|instructions?|message)`,
       "i",
     ),
     score: 0.8,
@@ -40,7 +40,7 @@ const RULES: Rule[] = [
     reason: "contains chat-template control tokens",
   },
   {
-    pattern: /^\s*(?:system|assistant)\s*:/im,
+    pattern: /^[ \t]{0,20}(?:system|assistant)[ \t]{0,5}:/im,
     score: 0.6,
     reason: "spoofs a system or assistant turn",
   },
