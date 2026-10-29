@@ -15,7 +15,7 @@ let tp = 0;
 let fp = 0;
 let fn = 0;
 let tn = 0;
-const misses: string[] = [];
+const misses: { kind: "false positive" | "false negative"; text: string }[] = [];
 
 for (const row of rows) {
   const blocked = !(await guard.check(row.text)).allowed;
@@ -23,10 +23,10 @@ for (const row of rows) {
   if (blocked && injection) tp++;
   else if (blocked) {
     fp++;
-    misses.push(`false positive: ${row.text}`);
+    misses.push({ kind: "false positive", text: row.text });
   } else if (injection) {
     fn++;
-    misses.push(`false negative: ${row.text}`);
+    misses.push({ kind: "false negative", text: row.text });
   } else tn++;
 }
 
@@ -51,7 +51,7 @@ const lines = [
   "",
   "<details><summary>Misclassified lines</summary>",
   "",
-  ...misses.map((m) => `- ${m.startsWith("false positive") ? "false positive" : "false negative"}: ${preview(m.slice(m.indexOf(": ") + 2))}`),
+  ...misses.map((m) => `- ${m.kind}: ${preview(m.text)}`),
   "",
   "</details>",
 ];
