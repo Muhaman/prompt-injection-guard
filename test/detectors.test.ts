@@ -50,7 +50,9 @@ describe("detectors", () => {
   });
 
   it("flags a long base64 blob", () => {
-    expect(encodedPayload("QUJD".repeat(50)).score).toBeGreaterThanOrEqual(0.5);
+    const blob = Buffer.from(Array.from({ length: 150 }, (_, i) => (i * 37 + 11) % 256)).toString("base64");
+    expect(blob).toHaveLength(200);
+    expect(encodedPayload(blob).score).toBeGreaterThanOrEqual(0.5);
   });
 
   it("scores base64 that decodes to an instruction higher", () => {
