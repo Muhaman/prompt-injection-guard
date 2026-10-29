@@ -69,7 +69,7 @@ const p = await guard.check("Email jane@example.com, card 4111 1111 1111 1111");
 // p.restore("Sent to [EMAIL_1]") === "Sent to jane@example.com"
 ```
 
-Options: `threshold` (0.5), `classifier`, `classifierBand` ([0.3, 0.7]), `redactPii` (true).
+Options: `threshold` (0.5), `classifier`, `classifierBand` ([0.3, 0.7]), `redactPii` (true), `maxLength` (20000).
 
 Blocked response from the middleware:
 
@@ -81,9 +81,10 @@ Blocked response from the middleware:
 
 - **Max of detectors, not a weighted sum.** Each detector is independently explainable and a single strong signal should block; the cost is no credit for several weak signals together.
 - **Normalize before matching.** NFKC, zero-width removal and decoding of Unicode tag characters stop trivial obfuscation (`i​gnore`, tag-smuggled text). `hiddenUnicode` itself sees the raw text.
-- **Classifier only in the ambiguous band.** Clear cases cost nothing; unclear ones get a model opinion. The classifier receives the PII-redacted text inside `<untrusted_input>` delimiters (any literal delimiter in the input is stripped), and its system prompt states the content is data.
+- **Classifier only in the ambiguous band.** Clear cases cost nothing; unclear ones get a model opinion. The classifier receives the PII-redacted text inside `<untrusted_input>` delimiters (angle brackets in the input are escaped, so no variant of the delimiter can close the block), and its system prompt states the content is data.
 - **Fail safe.** If the classifier refuses, truncates, returns invalid output or the API fails, `check()` keeps the heuristic score and adds a `classifier unavailable (...)` reason; it never throws.
 - **Refusal fallbacks only where supported.** `GUARD_MODEL` may be any model; the server-side fallback beta is sent only for `claude-opus-5-5` and `claude-sonnet-5-5`, never for Haiku.
+- **Bounded work.** Every regex quantifier is bounded and input over `maxLength` characters is blocked (`input too long`, score 1) before any detector runs, so adversarial input cannot force quadratic matching. A test asserts 50k-character pathological inputs finish in under 200 ms.
 - **Validated PII.** Cards must pass Luhn, IBANs mod-97, SSNs exclude impossible ranges, so order numbers and look-alikes are left alone.
 
 ## Testing
@@ -99,7 +100,7 @@ All verification runs in GitHub Actions; the `bench` job needs no API key and wr
 
 The bench set (`bench/dataset.jsonl`) is small (76 lines) and author-written: curated/synthetic, not a public benchmark. Results below are heuristics + PII only, no classifier.
 
-Output of the CI `bench` job ([run 40837723720](https://github.com/Muhaman/prompt-injection-guard/actions/runs/40837723720)), 38 injection and 38 benign lines, block when score >= 0.5:
+Output of the CI `bench` job ([run 40838441318](https://github.com/Muhaman/prompt-injection-guard/actions/runs/40838441318)), 38 injection and 38 benign lines, block when score >= 0.5:
 
 | Metric | Value |
 | --- | --- |
