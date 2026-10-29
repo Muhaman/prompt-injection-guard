@@ -99,7 +99,16 @@ All verification runs in GitHub Actions; the `bench` job needs no API key and wr
 
 The bench set (`bench/dataset.jsonl`) is small (76 lines) and author-written: curated/synthetic, not a public benchmark. Results below are heuristics + PII only, no classifier.
 
-Results are filled in from the CI `bench` job summary.
+Output of the CI `bench` job ([run 40837723720](https://github.com/Muhaman/prompt-injection-guard/actions/runs/40837723720)), 38 injection and 38 benign lines, block when score >= 0.5:
+
+| Metric | Value |
+| --- | --- |
+| Precision | 0.970 |
+| Recall | 0.842 |
+| F1 | 0.901 |
+| TP / FP / FN / TN | 32 / 1 / 6 / 37 |
+
+Misses: an HTML-comment injection, a gerund paraphrase ("ignoring the rules"), a persona with "no rules", a social-engineering "admin mode" request, a Spanish injection and an indirect resume injection (false negatives); and a benign sentence mentioning "developer mode" (false positive). The classifier layer is meant for cases like these but is not measured here.
 
 ## Limitations & next steps
 
