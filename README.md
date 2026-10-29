@@ -33,8 +33,10 @@ flowchart LR
 
 ## Quickstart
 
+This package is not published to npm; install it from GitHub (the `prepare` script builds it on install).
+
 ```bash
-npm install prompt-injection-guard express
+npm install github:Muhaman/prompt-injection-guard express
 ```
 
 ```ts
