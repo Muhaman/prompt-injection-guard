@@ -26,4 +26,5 @@ jobs:
           node-version-file: .nvmrc
       - run: npm install
       - name: Run bench (heuristics + PII, no API key)
+        shell: bash
         run: npm run --silent bench | tee -a "$GITHUB_STEP_SUMMARY"
