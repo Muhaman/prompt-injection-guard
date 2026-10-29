@@ -51,8 +51,9 @@ export function createClaudeClassifier(options: ClaudeClassifierOptions = {}): C
 
   return {
     async classify(text) {
-      // The attacker controls `text`: strip our own delimiter so it cannot close the block early.
-      const safe = text.replace(/<\/?untrusted_input>/gi, "");
+      // The attacker controls `text`: escape angle brackets so no variant of our delimiter
+      // (nested, spaced, mixed case) can close the block early.
+      const safe = text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
       try {
         const response = await client.beta.messages.parse({
           model,
